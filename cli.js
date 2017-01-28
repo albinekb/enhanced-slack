@@ -74,7 +74,7 @@ const tasks = new Listr([
     task: (ctx, task) => pathExists(unmodifiedAsarPath)
       .then(exists => {
         if (exists) {
-          task.skip('Backup already exists, use --restore to restore backup')
+          task.skip('Backup already exists, use --eject to restore backup')
           return
         }
 
