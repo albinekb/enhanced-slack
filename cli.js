@@ -26,7 +26,7 @@ async function readFileContents (path) {
   return string
 }
 
-// namespce is used to check that we don't add the script twice
+// namespace is used to check that we don't add the script twice
 const namespace = '/* INJECTED */'
 
 const slackAppPath = path.join('/Applications', 'Slack.app')
@@ -124,7 +124,7 @@ const tasks = new Listr([
   {
     title: 'Load default-config.json',
     enabled: ctx => !ctx.rawConfig,
-    task: (ctx, task) => readFileContents(path.join(__dirname, 'default-config.json'))
+    task: (ctx, task) => readFileContents(path.join(__dirname, 'fixtures', 'default-config.json'))
         .then(raw => {
           ctx.rawConfig = raw
         })
