@@ -5,7 +5,8 @@
   "scripts": {
     "inject": "node index.js",
     "eject": "node index.js --eject",
-    "asar": "asar"
+    "asar": "asar",
+    "test": "standard"
   },
   "bin": {
     "slack-enhanced": "./index.js"
