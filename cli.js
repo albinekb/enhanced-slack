@@ -162,6 +162,13 @@ const tasks = new Listr([
 if (argv.eject) {
   const tasks = new Listr([
     {
+      title: 'Check if backup exists',
+      task: (ctx, task) => pathExists(unmodifiedAsarPath)
+        .then((exists) => {
+          if (!exists) throw new Error(`Can't find unmodified asar (${unmodifiedAsarPath})`)
+        })
+    },
+    {
       title: 'Repack app.unmodified.asar to app.asar',
       task: () => repackAsar(unmodifiedAsarPath, asarPath)
     }
@@ -175,7 +182,7 @@ if (argv.eject) {
       console.log()
     })
     .catch(err => {
-      console.error('ERROR', err.Error)
+      console.error('💥 Error running tasks', err)
     })
 } else {
   tasks
@@ -186,6 +193,6 @@ if (argv.eject) {
     console.log()
   })
   .catch(err => {
-    console.error('ERROR', err.Error)
+    console.error('💥 Error running tasks', err)
   })
 }
