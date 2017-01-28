@@ -1,3 +1,9 @@
+/* global config */
+
+const {
+  theme
+} = config
+
 document.addEventListener('DOMContentLoaded', function () {
   var script = `
       scripts = [
@@ -15,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
       styles = [
-        '//cdn.jsdelivr.net/highlight.js/9.9.0/styles/agate.min.css'
+        '//cdn.jsdelivr.net/highlight.js/9.9.0/styles/${theme}.min.css'
       ]
 
       const stylesReady = Promise.all(styles.map((src, index) => {

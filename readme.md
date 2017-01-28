@@ -7,3 +7,8 @@ $ yarn run inject
 ```
 
 Restart slack, you should now see syntax highlighting 💅
+
+## Uninstalling
+```sh
+$ yarn run eject
+```
