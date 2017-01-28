@@ -30,13 +30,14 @@ async function readFileContents (path) {
 // namespce is used to check that we don't add the script twice
 const namespace = '/* INJECTED */'
 
-const slackRoot = path.join('/Applications', 'Slack.app', 'Contents', 'Resources')
+const slackAppPath = path.join('/Applications', 'Slack.app')
+const slackResourcesPath = path.join(slackAppPath, 'Contents', 'Resources')
 const asarFileName = 'app.asar'
-const asarPath = path.join(slackRoot, asarFileName)
+const asarPath = path.join(slackResourcesPath, asarFileName)
 const unmodifiedAsarFileName = 'app.unmodified.asar'
-const unmodifiedAsarPath = path.join(slackRoot, unmodifiedAsarFileName)
-const unpackedPath = path.join(slackRoot, '_app')
-const indexJsPath = path.join(unpackedPath, 'src', 'static', 'index.js')
+const unmodifiedAsarPath = path.join(slackResourcesPath, unmodifiedAsarFileName)
+const unpackedPath = path.join(slackResourcesPath, '_app')
+const entryJsPath = path.join(unpackedPath, 'src', 'static', 'index.js')
 
 // Run this in execa since asar.extractAll is sync
 const extractAsar = (from, to) => execa('npm', ['run', 'asar', 'extract', from, to])
@@ -52,7 +53,7 @@ const repackAsar = (from, to) => new Listr([
     task: (ctx, task) => extractAsar(from, ctx.tmpPath)
   },
   {
-    title: 'Pack asar to destination',
+    title: 'Repack asar to destination',
     task: (ctx, task) => pify(asar.createPackage)(ctx.tmpPath, to)
   },
   {
@@ -64,9 +65,18 @@ const repackAsar = (from, to) => new Listr([
 const tasks = new Listr([
   {
     title: 'Locating Slack.app',
-    task: () => pathExists(slackRoot)
+    task: (ctx, task) => pathExists(slackAppPath)
       .then((exists) => {
-        if (!exists) throw new Error(`Can't find Slack.app (${slackRoot})`)
+        if (!exists) throw new Error(`Couldn't find Slack.app (${slackAppPath})`)
+        task.title = `Locating Slack.app (${slackAppPath})`
+      })
+  },
+  {
+    title: 'Verify app.asar exists in Slack.app',
+    task: (ctx, task) => pathExists(asarPath)
+      .then((exists) => {
+        if (!exists) throw new Error(`Couldn't find app.asar (${asarPath})`)
+        task.title = `Found app.asar (${asarPath})`
       })
   },
   {
@@ -88,7 +98,7 @@ const tasks = new Listr([
   },
   {
     title: 'Load index.js',
-    task: (ctx) => readFileContents(indexJsPath)
+    task: (ctx) => readFileContents(entryJsPath)
       .then(source => {
         ctx.source = source.includes(namespace) ? source.split(namespace)[0] : source
       })
@@ -150,12 +160,16 @@ const tasks = new Listr([
         `const config = JSON.parse(\`${ctx.config}\`)`,
         ctx.injectSource
       ].join('\n')
-      return fz.writeFile(indexJsPath, newSource)
+      return fz.writeFile(entryJsPath, newSource)
     }
   },
   {
     title: 'Repack app.asar',
     task: () => pify(asar.createPackage)(unpackedPath, asarPath)
+  },
+  {
+    title: 'Cleanup',
+    task: () => fsp.remove(unpackedPath)
   }
 ])
 
