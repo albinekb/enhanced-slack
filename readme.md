@@ -18,10 +18,10 @@ Feel free to PR/open an issue with suggestions/beautifications! 👌
 
 ### Install
 ```sh
-$ git clone git@github.com:albinekb/enhanced-slack.git
-$ cd enhanced-slack
-$ yarn
-$ yarn run inject
+git clone git@github.com:albinekb/enhanced-slack.git
+cd enhanced-slack
+yarn
+yarn run inject
 ```
 
 Running `inject` will:
@@ -34,7 +34,7 @@ Restart Slack, you should now see syntax highlighting 💅
 
 ### Remove
 ```sh
-$ yarn run eject
+yarn run eject
 ```
 Running `eject` will:
 - Restore the original app.asar

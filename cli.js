@@ -20,11 +20,7 @@ const execa = require('execa')
 const Listr = require('listr')
 const pathExists = require('path-exists')
 
-async function readFileContents (path) {
-  const contents = await fsp.readFile(path)
-  const string = await contents.toString()
-  return string
-}
+const readFileContents = (path) => fsp.readFile(path).then(contents => contents.toString())
 
 // namespace is used to check that we don't add the script twice
 const namespace = '/* INJECTED */'
