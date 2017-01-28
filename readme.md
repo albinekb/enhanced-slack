@@ -1,8 +1,12 @@
 ## 🌴 Slack enhanced
 
-![preview](https://cloud.githubusercontent.com/assets/5027156/22395440/8287667e-e53e-11e6-8780-bc5b227ab52d.png)
+<img src="https://cloud.githubusercontent.com/assets/5027156/22395440/8287667e-e53e-11e6-8780-bc5b227ab52d.png" width="361">
 
 This is a proof of concept, to test the idea of injecting code into Slack.app.
+
+Current features:
+- Syntax highlight using [highlight.js](https://highlightjs.org)
+- Double click to edit message
 
 Next up:
 - Hot code reloading (no need to restart Slack.app)
