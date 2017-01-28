@@ -10,9 +10,8 @@ const argv = require('yargs')
   .help()
   .argv
 
-const themes = require('./themes')
+const availableThemes = require('./fixtures/hljs-themes')
 const path = require('path')
-const fz = require('mz/fs')
 const fsTemp = require('fs-temp/promise')
 const asar = require('asar')
 const pify = require('pify')
@@ -22,7 +21,7 @@ const Listr = require('listr')
 const pathExists = require('path-exists')
 
 async function readFileContents (path) {
-  const contents = await fz.readFile(path)
+  const contents = await fsp.readFile(path)
   const string = await contents.toString()
   return string
 }
@@ -72,15 +71,15 @@ const tasks = new Listr([
       })
   },
   {
-    title: 'Verify app.asar exists in Slack.app',
+    title: 'Find app.asar in Slack.app',
     task: (ctx, task) => pathExists(asarPath)
       .then((exists) => {
         if (!exists) throw new Error(`Couldn't find app.asar (${asarPath})`)
-        task.title = `Found app.asar (${asarPath})`
+        task.title = `Find app.asar in Slack.app (${asarPath})`
       })
   },
   {
-    title: `Backup app.asar to ${unmodifiedAsarFileName}`,
+    title: `Backup unmodified app.asar`,
     task: (ctx, task) => pathExists(unmodifiedAsarPath)
       .then(exists => {
         if (exists) {
@@ -114,27 +113,27 @@ const tasks = new Listr([
     title: 'Load config.json',
     task: (ctx, task) => readFileContents(path.join(__dirname, 'config.json'))
         .then(raw => {
-          ctx.config = raw
+          ctx.rawConfig = raw
         })
         .catch(() => {
-          ctx.config = false
+          ctx.rawConfig = false
 
           task.skip('No config.json found.')
         })
   },
   {
     title: 'Load default-config.json',
-    enabled: ctx => !ctx.config,
+    enabled: ctx => !ctx.rawConfig,
     task: (ctx, task) => readFileContents(path.join(__dirname, 'default-config.json'))
         .then(raw => {
-          ctx.config = raw
+          ctx.rawConfig = raw
         })
   },
   {
     title: 'Verify config',
     task: (ctx) => {
       try {
-        JSON.parse(ctx.config)
+        ctx.config = JSON.parse(ctx.rawConfig)
       } catch (_) {
         throw new Error('Error parsing config')
       }
@@ -143,11 +142,14 @@ const tasks = new Listr([
     }
   },
   {
-    title: `Verify theme (${argv.theme})`,
-    enabled: () => argv.theme,
+    title: `Verify theme`,
     task: (ctx, task) => {
-      if (themes.includes(argv.theme)) return
-      throw new Error(`Theme "${argv.theme}" does not exist`)
+      const theme = argv.theme || ctx.config.theme
+
+      if (!availableThemes.includes(theme)) throw new Error(`Theme "${theme}" does not exist`)
+
+      task.title = `Verify theme (${theme})`
+      ctx.overrideConfig = { theme }
     }
   },
   {
@@ -157,10 +159,10 @@ const tasks = new Listr([
         ctx.source.replace(/\n+$/g, ''),
         '\n',
         namespace,
-        `const config = JSON.parse(\`${ctx.config}\`)`,
+        `const config = JSON.parse(\`${JSON.stringify(Object.assign({}, ctx.config, ctx.overrideConfig))}\`)`,
         ctx.injectSource
       ].join('\n')
-      return fz.writeFile(entryJsPath, newSource)
+      return fsp.writeFile(entryJsPath, newSource)
     }
   },
   {

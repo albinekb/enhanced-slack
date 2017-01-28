@@ -7,6 +7,9 @@
     "eject": "node index.js --eject",
     "asar": "asar"
   },
+  "bin": {
+    "slack-enhanced": "./index.js"
+  },
   "license": "UNLICENSED",
   "dependencies": {
     "asar": "^0.13.0",
@@ -15,7 +18,6 @@
     "fs-promise": "^1.0.0",
     "fs-temp": "^1.1.2",
     "listr": "^0.10.0",
-    "mz": "^2.6.0",
     "path-exists": "^3.0.0",
     "pify": "^2.3.0",
     "yargs": "^6.6.0"
