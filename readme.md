@@ -1,5 +1,7 @@
 ## 🌴 Slack enhanced
 
+![preview](https://cloud.githubusercontent.com/assets/5027156/22395440/8287667e-e53e-11e6-8780-bc5b227ab52d.png)
+
 This is a proof of concept, to test the idea of injecting code into Slack.app.
 
 Next up:
