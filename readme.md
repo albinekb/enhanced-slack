@@ -1,4 +1,4 @@
-## 🌴 Slack enhanced
+## 🌴 Enhanced Slack
 
 <img src="https://cloud.githubusercontent.com/assets/5027156/22395478/17fc8a44-e540-11e6-898d-38cbad70ff4e.png" width="581">
 
