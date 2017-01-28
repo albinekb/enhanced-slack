@@ -65,8 +65,8 @@ const tasks = new Listr([
   {
     title: 'Locating Slack.app',
     task: () => pathExists(slackRoot)
-      .catch(() => {
-        throw new Error(`Can't find Slack.app (${slackRoot})`)
+      .then((exists) => {
+        if (!exists) throw new Error(`Can't find Slack.app (${slackRoot})`)
       })
   },
   {
